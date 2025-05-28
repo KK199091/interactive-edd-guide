@@ -10,7 +10,7 @@
         - Report Intro: Text -> Goal: Set Context -> Method: HTML Text -> Interaction: None.
         - Current Challenges (14 steps): Text/List -> Goal: Highlight Issues -> Method: HTML/CSS diagram with interactive hover for pain points -> Interaction: Hover on steps to reveal pain point details -> Justification: Visualizes process and directly links pain points.
         - Solution Pathways (Overall): Text -> Goal: Introduce Solutions -> Method: HTML Text.
-        - Each Solution Pathway (What it is, How it helps, Tech Stack): Text/Lists -> Goal: Detail Solution -> Method: HTML Text, styled lists -> Interaction: None direct.
+        - Each Solution Pathway (What it is, How it helps, Tech Stack, Implementation Steps & Tools): Text/Lists -> Goal: Detail Solution -> Method: HTML Text, styled lists -> Interaction: None direct.
         - Each Solution Pathway (Pros/Cons): Text list -> Goal: Compare Advantages/Disadvantages -> Method: Interactive Tabs (HTML/CSS/JS) -> Interaction: Click to switch views -> Justification: Concise presentation of comparative info.
         - Each Solution Pathway (Difficulty/Timeline): Text -> Goal: Quantify Effort -> Method: Chart.js Bar Chart -> Data: (Difficulty: Low=1, Med=2, High=3, V.High=4; Timeline: average months) -> Interaction: Hover for tooltips -> Justification: Visual comparison of effort.
         - Each Solution Pathway (Visuals described in report): Text description of visual -> Goal: Illustrate Concept -> Method: HTML/CSS div-based diagrams with Tailwind, Unicode icons -> Interaction: Static visual -> Justification: Replicates report's intended visuals without SVG.
@@ -171,6 +171,14 @@
             color: #ef4444; /* red-500 */
             margin-top: 10px;
         }
+        .implementation-steps ol {
+            list-style-type: decimal;
+            margin-left: 1.5rem;
+        }
+        .implementation-steps ul {
+            list-style-type: disc;
+            margin-left: 1.5rem;
+        }
     </style>
 </head>
 <body class="bg-amber-50 text-neutral-800">
@@ -211,7 +219,7 @@
                 
                 <section id="introduction" class="content-section space-y-4">
                     <h2 class="text-3xl font-semibold text-teal-700 border-b-2 border-teal-500 pb-2 mb-6">Introduction: The 10-Day Challenge and the Path to Efficiency</h2>
-                    <p class="text-lg leading-relaxed text-neutral-700">Current Organization has a commendably detailed Entity Due Diligence (EDD) process. This diligence is crucial in today's complex regulatory environment. However, the investment of 10 full-time equivalent (FTE) days per client is a significant operational cost and can impact scalability and responsiveness.</p>
+                    <p class="text-lg leading-relaxed text-neutral-700">Company has a commendably detailed Entity Due Diligence (EDD) process. This diligence is crucial in today's complex regulatory environment. However, the investment of 10 full-time equivalent (FTE) days per client is a significant operational cost and can impact scalability and responsiveness.</p>
                     <p class="text-lg leading-relaxed text-neutral-700">The good news is that a wealth of technological solutions exists today that can dramatically streamline this process, reduce manual effort, and empower your analysts to focus on the most critical, judgment-based aspects of EDD. This guide will walk you through various practical and achievable solution pathways. We'll explore how they can help, what they involve, and the pros and cons of each, all explained in a way that's easy to understand.</p>
                     <div class="mt-6 p-6 border border-neutral-300 rounded-lg shadow-md bg-neutral-50">
                         <h3 class="text-xl font-semibold text-neutral-700 mb-3 text-center">The EDD Journey: From Challenge to Opportunity</h3>
@@ -229,7 +237,7 @@
 
                 <section id="current-challenges" class="content-section space-y-4">
                     <h2 class="text-3xl font-semibold text-teal-700 border-b-2 border-teal-500 pb-2 mb-6">Understanding the Landscape: Where Can We Make the Biggest Difference?</h2>
-                    <p class="text-lg leading-relaxed text-neutral-700">Based on our earlier conversation, the most time-consuming and resource-intensive areas in current EDD process appear to be:</p>
+                    <p class="text-lg leading-relaxed text-neutral-700">Based on our earlier conversation, the most time-consuming and resource-intensive areas in Company's current EDD process appear to be:</p>
                     <ul class="list-disc list-inside text-lg leading-relaxed text-neutral-700 space-y-1 pl-4">
                         <li><strong>Third-party checks:</strong> Accessing and extracting data from WorldCheck and Factiva.</li>
                         <li><strong>Documentation:</strong> Capturing company profiles, findings from various searches, risk summaries, and completing Risk Management questions.</li>
@@ -238,7 +246,7 @@
                     </ul>
                     <p class="text-lg leading-relaxed text-neutral-700">These are common pain points in EDD, and thankfully, areas where modern technology offers substantial improvements.</p>
                      <div class="mt-6 p-4 border border-neutral-300 rounded-lg shadow">
-                        <h3 class="text-xl font-semibold text-neutral-700 mb-3">Current EDD Process (Hover for Pain Points):</h3>
+                        <h3 class="text-xl font-semibold text-neutral-700 mb-3">Company's EDD Process (Hover for Pain Points):</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="step-item bg-stone-50">1. ServiceNow Request <span class="tooltip">Pain Point: Manual data entry possible</span></div>
                             <div class="step-item bg-stone-50">2. EDD Team Approval <span class="tooltip">Pain Point: Potential delays in communication</span></div>
@@ -260,15 +268,15 @@
 
                 <section id="solution-pathways" class="content-section space-y-4">
                     <h2 class="text-3xl font-semibold text-teal-700 border-b-2 border-teal-500 pb-2 mb-6">Solution Pathways: Your Toolkit for Transformation</h2>
-                    <p class="text-lg leading-relaxed text-neutral-700">Let's explore the different types of solutions we could consider. Click on the sub-navigation links to explore each pathway.</p>
+                    <p class="text-lg leading-relaxed text-neutral-700">Let's explore the different types of solutions Company could consider. Click on the sub-navigation links to explore each pathway.</p>
                 </section>
 
                 <div id="solution-sections-container">
                     <section id="solution-regtech" class="content-section space-y-4">
                         <h3 class="text-2xl font-semibold text-neutral-700">1. All-in-One Super Helpers: Comprehensive RegTech Platforms</h3>
-                        <p class="italic text-neutral-600"><strong>Explained Simply:</strong> Imagine a giant, specialized toolbox built just for tasks like EDD. This toolbox has all the special instruments you need neatly organized in one place, and many of them can do their jobs automatically once you set them up. It helps manage the whole EDD job from start to finish.</p>
+                        <p class="italic text-neutral-600"><strong>Explained Simply:</strong> Imagine a giant, specialized toolbox built just for tasks like EDD. This toolbox, often a third-party software solution delivered as a SaaS (Software-as-a-Service) product, has all the special instruments you need neatly organized in one place. Many of these instruments can do their jobs automatically once you set them up. It helps manage the whole EDD job from start to finish, integrating various data sources and workflows into a single system.</p>
                         
-                        <h4 class="text-xl font-medium text-teal-600 mt-4">How it helps current EDD process:</h4>
+                        <h4 class="text-xl font-medium text-teal-600 mt-4">How it helps Company's process:</h4>
                         <ul class="list-disc list-inside text-neutral-700 space-y-1 pl-4">
                             <li><strong>Centralized Case Management:</strong> Could manage the entire lifecycle of an EDD request.</li>
                             <li><strong>Automated Data Ingestion & Screening:</strong> Automatically connect to WorldCheck and Factiva.</li>
@@ -303,8 +311,29 @@
                             </div>
                         </div>
 
-                        <p><strong>Technology Stack (Examples):</strong> Cloud-based SaaS platforms, often with AI/ML components.</p>
-                        <p><strong>Examples of Providers/Concepts:</strong> KYC/AML Platforms, Financial Crime Compliance Suites, EDD Solutions from FinTech/RegTech companies.</p>
+                        <p><strong>Technology Stack (Examples):</strong> Cloud-based SaaS platforms, often with AI/ML components for screening and risk assessment.</p>
+                        <p><strong>Examples of Providers/Concepts:</strong> KYC/AML Platforms (e.g., ComplyAdvantage, Moody's Analytics KYC, Refinitiv World-Check One), Financial Crime Compliance Suites, EDD Solutions from FinTech/RegTech companies.</p>
+                        
+                        <div class="implementation-steps mt-4 p-4 border border-dashed border-neutral-400 rounded-lg bg-neutral-50">
+                            <h4 class="text-lg font-semibold text-neutral-700 mb-2">Implementation Steps & Tools:</h4>
+                            <ol class="space-y-1 text-neutral-600">
+                                <li><strong>Define Requirements:</strong> Clearly document Company's specific EDD needs, workflow steps, data sources, integration points (ServiceNow, RMS), and desired outcomes.</li>
+                                <li><strong>Market Research & Vendor Selection:</strong> Identify and evaluate potential RegTech platform providers. Consider features, scalability, security, vendor reputation, and pricing. Request demos and conduct pilot projects if possible.</li>
+                                <li><strong>Configuration & Customization:</strong> Work with the chosen vendor to configure the platform to match Company's risk appetite, policies, and EDD workflow. This includes setting up risk scoring rules, user roles, and approval hierarchies.</li>
+                                <li><strong>Integration:</strong> Develop integrations with Company's existing systems (ServiceNow, RMS, conflict checking system) using APIs or other methods provided by the platform.</li>
+                                <li><strong>Data Migration (if applicable):</strong> Plan and execute the migration of existing client data and EDD records into the new platform.</li>
+                                <li><strong>User Acceptance Testing (UAT):</strong> Thoroughly test the configured platform with real-world scenarios to ensure it functions as expected and meets all requirements.</li>
+                                <li><strong>Training:</strong> Train all relevant Company staff (analysts, approvers, compliance officers) on how to use the new platform effectively.</li>
+                                <li><strong>Go-Live & Post-Implementation Support:</strong> Launch the platform and ensure ongoing support from the vendor and internal IT for any issues or adjustments.</li>
+                            </ol>
+                            <h5 class="text-md font-semibold text-neutral-700 mt-3 mb-1">Tools Needed:</h5>
+                            <ul class="space-y-1 text-neutral-600">
+                                <li>The RegTech Platform itself (SaaS subscription).</li>
+                                <li>Project management software (e.g., Jira, Asana, Microsoft Project) for tracking implementation.</li>
+                                <li>Documentation tools (e.g., Confluence, SharePoint) for requirements and training materials.</li>
+                                <li>Potentially, integration middleware or API development resources.</li>
+                            </ul>
+                        </div>
                         
                         <div class="mt-4 p-4 border border-neutral-300 rounded-lg shadow-sm">
                             <h4 class="text-lg font-semibold text-neutral-700 mb-2">Difficulty & Timeline:</h4>
@@ -346,7 +375,7 @@
                         <h3 class="text-2xl font-semibold text-neutral-700">2. Smart Little Helpers: AI-Powered Point Solutions</h3>
                         <p class="italic text-neutral-600"><strong>Explained Simply:</strong> Instead of one giant toolbox, imagine having a team of small, super-smart robots. Each robot is an expert at one specific, tricky job – like reading thousands of news articles in a flash to find bad news, or instantly checking names against watchlists with amazing accuracy.</p>
                         
-                        <h4 class="text-xl font-medium text-teal-600 mt-4">How it helps current EDD process:</h4>
+                        <h4 class="text-xl font-medium text-teal-600 mt-4">How it helps Company's process:</h4>
                         <ul class="list-disc list-inside text-neutral-700 space-y-1 pl-4">
                             <li><strong>Adverse Media Screening :</strong> AI scans news, uses NLP, summarizes findings, reduces false positives.</li>
                             <li><strong>PEP & Sanctions Screening :</strong> Enhanced accuracy for matching names, reduces false positives.</li>
@@ -365,12 +394,12 @@
                                         <li>Provides targeted improvements for specific, high-effort tasks.</li>
                                         <li>Often implemented more quickly and at a lower initial cost.</li>
                                         <li>Can be integrated with existing systems (RiskManagementSystem, ServiceNow) via APIs.</li>
-                                        <li>Allows picking best-of-breed solutions.</li>
+                                        <li>Allows Company to pick best-of-breed solutions.</li>
                                     </ul>
                                 </div>
                                 <div class="tab-content" data-tab="cons">
                                      <ul class="list-disc list-inside text-neutral-700 space-y-1">
-                                        <li>Need to manage and integrate multiple solutions.</li>
+                                        <li>Company would need to manage and integrate multiple solutions.</li>
                                         <li>Ensuring seamless data flow can be challenging.</li>
                                         <li>Workflow might still have manual hand-offs if not well integrated.</li>
                                     </ul>
@@ -380,14 +409,34 @@
                         
                         <p><strong>Technology Stack:</strong> Machine Learning (ML), Natural Language Processing (NLP), Optical Character Recognition (OCR), APIs. Often SaaS.</p>
                         
+                        <div class="implementation-steps mt-4 p-4 border border-dashed border-neutral-400 rounded-lg bg-neutral-50">
+                            <h4 class="text-lg font-semibold text-neutral-700 mb-2">Implementation Steps & Tools:</h4>
+                            <ol class="space-y-1 text-neutral-600">
+                                <li><strong>Identify Specific Pain Points:</strong> Pinpoint the EDD steps where AI can provide the most significant benefit (e.g., adverse media screening, document review).</li>
+                                <li><strong>Research & Select Vendor/Tool:</strong> For each identified pain point, research specialized AI vendors or tools. Evaluate their capabilities, accuracy, integration options (APIs are key), security, and cost.</li>
+                                <li><strong>Proof of Concept (PoC):</strong> Conduct a PoC with a selected tool using Company's data and scenarios to validate its effectiveness and suitability.</li>
+                                <li><strong>Integration Planning & Development:</strong> Design how the AI tool will integrate with Company's existing workflow and systems (RMS, ServiceNow). This usually involves API integration to send data to the AI tool and receive results.</li>
+                                <li><strong>Configuration & Testing:</strong> Configure the AI tool (e.g., set thresholds for alerts, define data fields for extraction). Thoroughly test the integration and the AI tool's performance.</li>
+                                <li><strong>User Training:</strong> Train analysts on how to use the new AI tool, interpret its outputs, and manage any exceptions or escalations.</li>
+                                <li><strong>Deployment & Monitoring:</strong> Roll out the AI solution. Continuously monitor its performance, accuracy, and impact on the EDD process, making adjustments as needed.</li>
+                            </ol>
+                            <h5 class="text-md font-semibold text-neutral-700 mt-3 mb-1">Tools Needed:</h5>
+                            <ul class="space-y-1 text-neutral-600">
+                                <li>Specific AI-powered SaaS tools for tasks like adverse media screening (e.g., specialized news aggregation and NLP services), PEP/sanctions screening, or document analysis.</li>
+                                <li>API development tools and potentially an Integration Platform as a Service (iPaaS) if managing multiple integrations.</li>
+                                <li>Internal development resources or external consultants for API integration.</li>
+                                <li>Data validation and testing tools.</li>
+                            </ul>
+                        </div>
+
                         <div class="mt-4 p-4 border border-neutral-300 rounded-lg shadow-sm">
                             <h4 class="text-lg font-semibold text-neutral-700 mb-2">Difficulty & Timeline:</h4>
-                            <div class="chart-container"><canvas id="aiPointChart"></canvas></div>
+                            <div class="chart-container"><canvas id="aipointChart"></canvas></div>
                         </div>
 
                         <div class="mt-6 p-4 border border-neutral-300 rounded-lg shadow-md bg-stone-50">
                             <h4 class="text-lg font-semibold text-neutral-700 mb-3 text-center">Conceptual Diagram: AI Point Solutions in Workflow</h4>
-                            <div class="text-center text-neutral-700">Ajeebo's 14-Step Workflow</div>
+                            <div class="text-center text-neutral-700">Company's EDD Workflow</div>
                             <div class="flex justify-around items-center mt-2 flex-wrap">
                                 <div class="diagram-box text-sm m-1">Financial viability concerns <br/>+<br/> <span class="text-teal-600 font-bold">🤖</span> AI Doc Analyzer</div>
                                 <div class="diagram-arrow"></div>
@@ -403,7 +452,7 @@
                         <h3 class="text-2xl font-semibold text-neutral-700">3. The "Copilot" Approach: Generative AI & LLMs for Enhanced Productivity</h3>
                          <p class="italic text-neutral-600"><strong>Explained Simply:</strong> Imagine giving your analysts a super-smart assistant (like a "copilot" for their computer work). This assistant can understand plain English questions, read through large amounts of text very quickly, write first drafts of summaries or reports, and help find information. Your analyst is still the pilot, guiding the assistant and checking all its work.</p>
                         
-                        <h4 class="text-xl font-medium text-teal-600 mt-4">How it helps Ajeebo's process:</h4>
+                        <h4 class="text-xl font-medium text-teal-600 mt-4">How it helps Company's process:</h4>
                         <ul class="list-disc list-inside text-neutral-700 space-y-1 pl-4">
                             <li><strong>Automated Report & Summary Generation :</strong> Drafts summaries, company profiles, RMS answers.</li>
                             <li><strong>Information Synthesis & Q&A:</strong> Answers natural language questions about clients.</li>
@@ -438,9 +487,33 @@
 
                         <p><strong>Technology Stack:</strong> Large Language Models (LLMs like GPT, Claude), APIs, Retrieval Augmented Generation (RAG).</p>
                         
+                        <div class="implementation-steps mt-4 p-4 border border-dashed border-neutral-400 rounded-lg bg-neutral-50">
+                            <h4 class="text-lg font-semibold text-neutral-700 mb-2">Implementation Steps & Tools:</h4>
+                            <ol class="space-y-1 text-neutral-600">
+                                <li><strong>Define Specific Use Cases:</strong> Clearly identify tasks where GenAI can assist (e.g., summarizing adverse media, drafting company profiles, answering RMS questions based on findings).</li>
+                                <li><strong>Select LLM and Deployment Model:</strong> Choose an appropriate LLM (e.g., OpenAI's GPT series, Anthropic's Claude, open-source models). Decide on deployment: public cloud API (consider data privacy implications), private cloud instance, or on-premise (more complex).</li>
+                                <li><strong>Data Preparation & "Grounding" (RAG):</strong> Prepare and structure Company's data sources (WorldCheck extracts, Factiva results, internal documents, RMS data) so the LLM can access and use them accurately (Retrieval Augmented Generation). This often involves creating vector embeddings of your data.</li>
+                                <li><strong>Prompt Engineering:</strong> Develop effective prompts that guide the LLM to generate the desired outputs accurately and in the correct format.</li>
+                                <li><strong>Develop Application Layer/Interface:</strong> Build a user interface or integration point for analysts to interact with the GenAI solution (e.g., a chatbot, a button in RMS to "draft summary").</li>
+                                <li><strong>Rigorous Testing & Validation:</strong> Extensively test the GenAI's outputs for accuracy, relevance, and absence of "hallucinations." Implement human review workflows.</li>
+                                <li><strong>Security & Privacy Review:</strong> Ensure the solution complies with data privacy regulations and Company's security policies.</li>
+                                <li><strong>User Training & Guidelines:</strong> Train analysts on how to use the GenAI tool effectively, its limitations, and the importance of critical review.</li>
+                                <li><strong>Iterative Refinement:</strong> Continuously monitor performance, gather user feedback, and refine prompts and data sources.</li>
+                            </ol>
+                            <h5 class="text-md font-semibold text-neutral-700 mt-3 mb-1">Tools Needed:</h5>
+                            <ul class="space-y-1 text-neutral-600">
+                                <li>Access to LLMs (via API like OpenAI API, or self-hosted models).</li>
+                                <li>Vector database (e.g., Pinecone, Weaviate, Chroma) for RAG.</li>
+                                <li>Frameworks for LLM application development (e.g., LangChain, LlamaIndex).</li>
+                                <li>Cloud services (AWS, Azure, GCP) for hosting, data storage, and potentially managed AI services.</li>
+                                <li>Development tools for building the application layer and integrations.</li>
+                                <li>MLOps tools for managing and monitoring LLM deployments (if applicable).</li>
+                            </ul>
+                        </div>
+
                         <div class="mt-4 p-4 border border-neutral-300 rounded-lg shadow-sm">
                             <h4 class="text-lg font-semibold text-neutral-700 mb-2">Difficulty & Timeline:</h4>
-                            <div class="chart-container"><canvas id="genAiChart"></canvas></div>
+                            <div class="chart-container"><canvas id="genaiChart"></canvas></div>
                         </div>
 
                         <div class="mt-6 p-4 border border-neutral-300 rounded-lg shadow-md bg-stone-50">
@@ -468,7 +541,7 @@
                         <h3 class="text-2xl font-semibold text-neutral-700">4. Making Repetitive Tasks Vanish: Workflow Automation & Robotic Process Automation (RPA)</h3>
                         <p class="italic text-neutral-600"><strong>Explained Simply:</strong> Think of software "robots" that you can teach to do the boring, repetitive, click-by-click tasks that your analysts currently do on their computers. This could be things like copying information from one system and pasting it into another, logging into websites, or filling out standard forms.</p>
                         
-                        <h4 class="text-xl font-medium text-teal-600 mt-4">How it helps current EDD process:</h4>
+                        <h4 class="text-xl font-medium text-teal-600 mt-4">How it helps Company's process:</h4>
                         <ul class="list-disc list-inside text-neutral-700 space-y-1 pl-4">
                             <li><strong>Data Entry & Transfer:</strong> Automate ServiceNow to RiskManagementSystem, copy/paste findings.</li>
                             <li><strong>System Interactions:</strong> Automate logins, searches, report downloads.</li>
@@ -501,6 +574,26 @@
                         
                         <p><strong>Technology Stack:</strong> RPA platforms (UiPath, Blue Prism, Automation Anywhere, Power Automate).</p>
                         
+                        <div class="implementation-steps mt-4 p-4 border border-dashed border-neutral-400 rounded-lg bg-neutral-50">
+                            <h4 class="text-lg font-semibold text-neutral-700 mb-2">Implementation Steps & Tools:</h4>
+                            <ol class="space-y-1 text-neutral-600">
+                                <li><strong>Identify & Prioritize Automatable Tasks:</strong> Analyze the 14-step EDD process to find highly repetitive, rule-based, manual tasks suitable for RPA (e.g., data copying between systems, form filling, logging into websites). Prioritize based on volume, time saved, and error reduction potential.</li>
+                                <li><strong>Select RPA Tool:</strong> Choose an RPA platform that fits Company's needs and technical environment (e.g., UiPath, Blue Prism, Microsoft Power Automate).</li>
+                                <li><strong>Process Mapping & Documentation:</strong> Document the selected tasks in detail, step-by-step, exactly as a human performs them. This is crucial for bot development.</li>
+                                <li><strong>Bot Development:</strong> Use the RPA tool's development studio to create the software bot, programming it to mimic human actions on the user interfaces of the target applications (ServiceNow, RMS, WorldCheck, Factiva).</li>
+                                <li><strong>Testing:</strong> Thoroughly test the bot in a non-production environment. Test for various scenarios, data inputs, and potential exceptions.</li>
+                                <li><strong>Deployment:</strong> Deploy the bot to the production environment. This might involve installing RPA agents on user machines or servers.</li>
+                                <li><strong>Monitoring & Maintenance:</strong> Continuously monitor the bot's performance. Be prepared for maintenance, as bots can "break" if the UIs of the applications they interact with change.</li>
+                            </ol>
+                            <h5 class="text-md font-semibold text-neutral-700 mt-3 mb-1">Tools Needed:</h5>
+                            <ul class="space-y-1 text-neutral-600">
+                                <li>RPA Software Platform (e.g., UiPath Studio/Orchestrator, Power Automate Desktop).</li>
+                                <li>Process discovery and mapping tools (can be part of RPA suites or standalone like Visio).</li>
+                                <li>Access to development and testing environments for target applications.</li>
+                                <li>Version control for bot scripts (e.g., Git).</li>
+                            </ul>
+                        </div>
+
                         <div class="mt-4 p-4 border border-neutral-300 rounded-lg shadow-sm">
                             <h4 class="text-lg font-semibold text-neutral-700 mb-2">Difficulty & Timeline:</h4>
                             <div class="chart-container"><canvas id="rpaChart"></canvas></div>
@@ -523,11 +616,11 @@
 
                     <section id="solution-custom" class="content-section space-y-4">
                         <h3 class="text-2xl font-semibold text-neutral-700">5. Building it Your Way: Custom-Developed Integrated Solutions</h3>
-                        <p class="italic text-neutral-600"><strong>Explained Simply:</strong> This is like Company deciding to design and build its very own, perfect EDD workshop from the ground up. Every tool, every workbench, every connection is custom-made to fit Ajeebo's exact needs and preferences.</p>
+                        <p class="italic text-neutral-600"><strong>Explained Simply:</strong> This is like Company deciding to design and build its very own, perfect EDD workshop from the ground up. Every tool, every workbench, every connection is custom-made to fit Company's exact needs and preferences.</p>
                         
-                        <h4 class="text-xl font-medium text-teal-600 mt-4">How it helps current EDD process:</h4>
+                        <h4 class="text-xl font-medium text-teal-600 mt-4">How it helps Company's process:</h4>
                         <ul class="list-disc list-inside text-neutral-700 space-y-1 pl-4">
-                            <li>Bespoke software tailored precisely to current Primary EDD workflow.</li>
+                            <li>Bespoke software tailored precisely to Company's Primary EDD workflow.</li>
                             <li>Combines elements: case management, custom AI, automated workflows, deep integrations.</li>
                             <li>Key considerations: scalability, flexibility, real-time processing.</li>
                         </ul>
@@ -559,6 +652,35 @@
 
                         <p><strong>Technology Stack:</strong> Highly varied (Python, Java, Cloud platforms, SQL/NoSQL DBs, AI/ML frameworks, custom APIs).</p>
                         
+                        <div class="implementation-steps mt-4 p-4 border border-dashed border-neutral-400 rounded-lg bg-neutral-50">
+                            <h4 class="text-lg font-semibold text-neutral-700 mb-2">Implementation Steps & Tools:</h4>
+                            <ol class="space-y-1 text-neutral-600">
+                                <li><strong>In-depth Requirements Gathering & Analysis:</strong> Go beyond high-level needs. Detail every user story, data flow, business rule, and integration point for Company's ideal EDD system.</li>
+                                <li><strong>Architectural Design:</strong> Design the overall system architecture, including database schema, microservices (if any), API contracts, user interface/user experience (UI/UX), and security model. Choose the technology stack.</li>
+                                <li><strong>Development Team Setup:</strong> Assemble an internal development team or select and onboard external development partners with expertise in the chosen technologies and domain.</li>
+                                <li><strong>Agile Development Sprints:</strong> Develop the solution iteratively in sprints. Each sprint should deliver a testable increment of functionality. Involve stakeholders (analysts, compliance) regularly for feedback.</li>
+                                <li><strong>Custom AI/ML Model Development (if applicable):</strong> If off-the-shelf AI isn't sufficient, this involves data collection, model training, tuning, and deployment for specific tasks like risk scoring or anomaly detection.</li>
+                                <li><strong>Comprehensive Testing:</strong> Conduct unit testing, integration testing, system testing, performance testing, and security testing throughout the development lifecycle. UAT with end-users is critical.</li>
+                                <li><strong>Deployment & Infrastructure Setup:</strong> Set up the necessary cloud or on-premise infrastructure. Implement CI/CD (Continuous Integration/Continuous Deployment) pipelines for automated builds and deployments.</li>
+                                <li><strong>Data Migration & Integration:</strong> Migrate data from existing systems and build robust integrations with ServiceNow, RMS, conflict checkers, and third-party data providers (WorldCheck, Factiva via APIs).</li>
+                                <li><strong>User Training & Documentation:</strong> Create comprehensive user manuals and training programs.</li>
+                                <li><strong>Ongoing Maintenance & Evolution:</strong> Plan for ongoing bug fixes, security updates, performance monitoring, and future enhancements based on user feedback and evolving business needs.</li>
+                            </ol>
+                            <h5 class="text-md font-semibold text-neutral-700 mt-3 mb-1">Tools Needed:</h5>
+                            <ul class="space-y-1 text-neutral-600">
+                                <li>Programming Languages (e.g., Python, Java, JavaScript, C#).</li>
+                                <li>Web Frameworks (e.g., Django, Spring Boot, React, Angular, .NET).</li>
+                                <li>Databases (e.g., PostgreSQL, MySQL, MongoDB, Elasticsearch).</li>
+                                <li>Cloud Platform Services (AWS, Azure, GCP for compute, storage, databases, AI/ML services).</li>
+                                <li>API Development & Management Tools (e.g., Postman, Swagger/OpenAPI, API gateways).</li>
+                                <li>Version Control Systems (e.g., Git, GitHub, GitLab).</li>
+                                <li>CI/CD Tools (e.g., Jenkins, GitLab CI, GitHub Actions).</li>
+                                <li>Project Management & Collaboration Tools (e.g., Jira, Confluence, Slack, Microsoft Teams).</li>
+                                <li>Testing Frameworks and Tools (e.g., Selenium, JUnit, PyTest).</li>
+                                <li>AI/ML Development Platforms and Libraries (e.g., TensorFlow, PyTorch, scikit-learn, SageMaker, Azure ML).</li>
+                            </ul>
+                        </div>
+
                         <div class="mt-4 p-4 border border-neutral-300 rounded-lg shadow-sm">
                             <h4 class="text-lg font-semibold text-neutral-700 mb-2">Difficulty & Timeline:</h4>
                             <div class="chart-container"><canvas id="customChart"></canvas></div>
@@ -567,7 +689,7 @@
                         <div class="mt-6 p-4 border border-neutral-300 rounded-lg shadow-md bg-stone-50">
                             <h4 class="text-lg font-semibold text-neutral-700 mb-3 text-center">Conceptual Diagram: Custom EDD Platform</h4>
                             <div class="diagram-box w-3/4 mx-auto bg-teal-100 border-teal-500">
-                                Ajeebo Custom EDD Platform
+                                Company Custom EDD Platform
                                 <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
                                     <div class="diagram-box text-xs border-teal-300">Step 1 Module</div>
                                     <div class="diagram-box text-xs border-teal-300">Step 2 Module</div>
@@ -584,7 +706,7 @@
 
                 <section id="important-considerations" class="content-section space-y-4">
                     <h2 class="text-3xl font-semibold text-teal-700 border-b-2 border-teal-500 pb-2 mb-6">Important Considerations for Any Solution</h2>
-                    <p class="text-lg leading-relaxed text-neutral-700">No matter which path or combination of paths Ajeebo explores, some universal truths apply. Click on each consideration to expand:</p>
+                    <p class="text-lg leading-relaxed text-neutral-700">No matter which path or combination of paths Company explores, some universal truths apply. Click on each consideration to expand:</p>
                     <div id="considerations-list" class="space-y-3 mt-4">
                         <div class="consideration-item">
                             <h3 class="consideration-title text-xl font-medium text-neutral-700 hover:text-teal-600 flex justify-between items-center">
@@ -631,7 +753,7 @@
                                 Maintain Regulatory Compliance <span class="text-teal-500 text-2xl ml-2 transform transition-transform duration-200">+</span>
                             </h3>
                             <div class="consideration-content text-neutral-600 mt-1 leading-relaxed">
-                               Any new tool or process must ensure Ajeebo meets all obligations (AUSTRAC rules, etc.). Technology should enhance compliance.
+                               Any new tool or process must ensure Company meets all its obligations (AUSTRAC rules, etc.). Technology should enhance compliance.
                             </div>
                         </div>
                          <div class="consideration-item">
@@ -719,24 +841,29 @@
             const passwordInput = document.getElementById('password-input');
             const passwordSubmit = document.getElementById('password-submit');
             const errorMessage = document.getElementById('error-message');
-            const correctPassword = "VeloxAI"; // Define the correct password
+            const correctPassword = "VeloxAI"; 
 
             function initializeApp() {
-                // All the original DOMContentLoaded logic goes here
                 const sidebarLinks = document.querySelectorAll('.sidebar-link');
                 const contentSections = document.querySelectorAll('.content-section');
                 const solutionSectionsContainer = document.getElementById('solution-sections-container');
                 
                 const solutionData = {
                     regtech: { difficulty: 3, timeline: 12, label: 'RegTech Platform' },
-                    aipoint: { difficulty: 2, timeline: 7.5, label: 'AI Point Solution' },
+                    aipoint: { difficulty: 2, timeline: 8, label: 'AI Point Solution' },
                     genai: { difficulty: 3, timeline: 9, label: 'GenAI & LLMs' },
                     rpa: { difficulty: 1, timeline: 2, label: 'RPA & Workflow Automation' },
                     custom: { difficulty: 4, timeline: 18, label: 'Custom Solution' }
                 };
 
                 function createChart(canvasId, data) {
-                    const ctx = document.getElementById(canvasId).getContext('2d');
+                    const canvasElement = document.getElementById(canvasId);
+                    if (!canvasElement) {
+                        console.error(`[createChart] Canvas element with ID '${canvasId}' not found.`);
+                        return; 
+                    }
+                    const ctx = canvasElement.getContext('2d');
+                    
                     if (window.charts && window.charts[canvasId]) {
                         window.charts[canvasId].destroy();
                     }
@@ -824,7 +951,16 @@
 
                     if (targetSectionId.startsWith('solution-') && solutionData[targetSectionId.substring(9)]) {
                         const solutionKey = targetSectionId.substring(9);
-                        createChart(`${solutionKey}Chart`, solutionData[solutionKey]);
+                        const currentCanvasId = `${solutionKey}Chart`;
+                        
+                        setTimeout(() => {
+                            const canvasElement = document.getElementById(currentCanvasId);
+                            if (canvasElement) {
+                                createChart(currentCanvasId, solutionData[solutionKey]);
+                            } else {
+                                console.error(`[activateSection] Canvas element with ID '${currentCanvasId}' not found after timeout for solution key '${solutionKey}'.`);
+                            }
+                        }, 0); 
                     }
                     window.scrollTo(0,0); 
                 }
@@ -836,6 +972,7 @@
                         if(window.location.hash !== newHash) {
                             window.location.hash = newHash;
                         } else {
+                            // If hash is the same, still call activateSection to ensure correct display (e.g. on page load with hash) or re-trigger chart
                             activateSection(newHash);
                         }
                     });
@@ -843,10 +980,11 @@
 
                 window.addEventListener('hashchange', () => activateSection(window.location.hash));
 
+                // Initial activation based on URL hash or default to introduction
                 if (window.location.hash) {
                     activateSection(window.location.hash);
                 } else {
-                    activateSection('#introduction');
+                    activateSection('#introduction'); // Default section
                 }
 
                 const solutionTabContainers = document.querySelectorAll('.solution-tabs');
@@ -856,17 +994,17 @@
 
                     tabButtons.forEach(button => {
                         button.addEventListener('click', function() {
+                            // Deactivate all buttons and content in this specific container
                             tabButtons.forEach(btn => btn.classList.remove('active'));
-                            this.classList.add('active');
+                            tabContents.forEach(content => content.classList.remove('active'));
 
+                            // Activate clicked button and corresponding content
+                            this.classList.add('active');
                             const targetTab = this.getAttribute('data-tab');
-                            tabContents.forEach(content => {
-                                if (content.getAttribute('data-tab') === targetTab) {
-                                    content.classList.add('active');
-                                } else {
-                                    content.classList.remove('active');
-                                }
-                            });
+                            const targetContent = container.querySelector(`.tab-content[data-tab="${targetTab}"]`);
+                            if(targetContent) {
+                                targetContent.classList.add('active');
+                            }
                         });
                     });
                 });
@@ -886,15 +1024,14 @@
                 });
             }
 
-            // Password check logic
             function checkPassword() {
                 if (passwordInput.value === correctPassword) {
                     passwordPromptContainer.style.display = 'none';
                     appContainer.style.display = 'block';
-                    initializeApp(); // Initialize the app's main functionalities
+                    initializeApp(); 
                 } else {
                     errorMessage.classList.remove('hidden');
-                    passwordInput.value = ''; // Clear the input
+                    passwordInput.value = ''; 
                     passwordInput.focus();
                 }
             }
@@ -906,7 +1043,6 @@
                 }
             });
             
-            // Focus on password input on load
             passwordInput.focus();
 
         });
