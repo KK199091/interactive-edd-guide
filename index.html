@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive SPA: EDD Solutions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Visualization & Content Choices:
+        - Report Intro: Text -> Goal: Set Context -> Method: HTML Text -> Interaction: None.
+        - Current Challenges (14 steps): Text/List -> Goal: Highlight Issues -> Method: HTML/CSS diagram with interactive hover for pain points -> Interaction: Hover on steps to reveal pain point details -> Justification: Visualizes process and directly links pain points.
+        - Solution Pathways (Overall): Text -> Goal: Introduce Solutions -> Method: HTML Text.
+        - Each Solution Pathway (What it is, How it helps, Tech Stack): Text/Lists -> Goal: Detail Solution -> Method: HTML Text, styled lists -> Interaction: None direct.
+        - Each Solution Pathway (Pros/Cons): Text list -> Goal: Compare Advantages/Disadvantages -> Method: Interactive Tabs (HTML/CSS/JS) -> Interaction: Click to switch views -> Justification: Concise presentation of comparative info.
+        - Each Solution Pathway (Difficulty/Timeline): Text -> Goal: Quantify Effort -> Method: Chart.js Bar Chart -> Data: (Difficulty: Low=1, Med=2, High=3, V.High=4; Timeline: average months) -> Interaction: Hover for tooltips -> Justification: Visual comparison of effort.
+        - Each Solution Pathway (Visuals described in report): Text description of visual -> Goal: Illustrate Concept -> Method: HTML/CSS div-based diagrams with Tailwind, Unicode icons -> Interaction: Static visual -> Justification: Replicates report's intended visuals without SVG.
+        - Important Considerations: List -> Goal: Highlight Key Factors -> Method: HTML list with JS toggle for details -> Interaction: Click to expand/collapse -> Justification: Focused presentation.
+        - Phased Approach: Text/List -> Goal: Outline Implementation Plan -> Method: HTML/CSS horizontal timeline with clickable phases, Unicode icons -> Interaction: Click phase to see details (conceptual, details shown inline) -> Justification: Visual and interactive roadmap.
+        - Conclusion: Text -> Goal: Summarize -> Method: HTML Text.
+        - NO SVG/Mermaid used. Chart.js for bar charts, HTML/CSS for diagrams. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .sidebar-link.active {
+            background-color: #ccfbf1; /* teal-100 */
+            color: #0f766e; /* teal-700 */
+            font-weight: 600;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .tab-button.active {
+            background-color: #0d9488; /* teal-600 */
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .diagram-box {
+            border: 2px solid #9ca3af; 
+            padding: 0.75rem;
+            margin: 0.5rem;
+            text-align: center;
+            border-radius: 0.375rem;
+            background-color: #f3f4f6; 
+        }
+        .diagram-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0.25rem 0;
+            color: #6b7280; 
+        }
+        .diagram-arrow::after {
+            content: '→'; 
+            font-size: 1.5rem;
+            margin-left: 0.25rem;
+            margin-right: 0.25rem;
+        }
+        .diagram-line {
+            width: 2px;
+            background-color: #9ca3af; 
+            margin: 0 auto;
+        }
+        .horizontal-line {
+            height: 2px;
+            background-color: #9ca3af;
+            flex-grow: 1;
+        }
+        .step-item {
+            position: relative;
+            padding: 8px;
+            border: 1px solid #e5e7eb; 
+            border-radius: 4px;
+            margin-bottom: 8px;
+            cursor: default;
+        }
+        .step-item .tooltip {
+            visibility: hidden;
+            width: 200px;
+            background-color: #374151; 
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .step-item .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #374151 transparent transparent transparent;
+        }
+        .step-item:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        .consideration-title {
+            cursor: pointer;
+        }
+        .consideration-content {
+            display: none;
+            padding-left: 1rem;
+            border-left: 2px solid #14b8a6; 
+            margin-left: 0.5rem;
+        }
+        /* Styles for password protection */
+        #app-container {
+            display: none; /* Initially hide the app content */
+        }
+        #password-prompt-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f9fafb; /* gray-50 */
+            padding: 20px;
+        }
+        #password-input {
+            padding: 10px;
+            border: 1px solid #d1d5db; /* gray-300 */
+            border-radius: 0.375rem;
+            margin-bottom: 10px;
+            width: 100%;
+            max-width: 300px;
+        }
+        #password-submit {
+            padding: 10px 20px;
+            background-color: #0d9488; /* teal-600 */
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+        }
+        #password-submit:hover {
+            background-color: #0f766e; /* teal-700 */
+        }
+        #error-message {
+            color: #ef4444; /* red-500 */
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body class="bg-amber-50 text-neutral-800">
+
+    <div id="password-prompt-container">
+        <h2 class="text-2xl font-semibold text-neutral-700 mb-4">Enter Password to Access</h2>
+        <input type="password" id="password-input" placeholder="Password">
+        <button id="password-submit">Submit</button>
+        <p id="error-message" class="hidden">Incorrect password. Please try again.</p>
+    </div>
+
+    <div id="app-container">
+        <header class="bg-neutral-800 text-white p-6 shadow-md">
+            <h1 class="text-3xl font-bold text-center">Entity Due Diligence: An Interactive Guide</h1>
+        </header>
+
+        <div class="flex flex-col md:flex-row min-h-screen">
+            <aside id="sidebar" class="w-full md:w-64 bg-stone-100 p-4 space-y-2 md:sticky md:top-0 md:self-start md:h-screen overflow-y-auto shadow-lg">
+                <h2 class="text-xl font-semibold text-neutral-700 mb-4 border-b-2 border-neutral-300 pb-2">Navigation</h2>
+                <a href="#introduction" class="sidebar-link block p-3 rounded-md hover:bg-teal-100 hover:text-teal-700 transition-colors duration-200">Introduction</a>
+                <a href="#current-challenges" class="sidebar-link block p-3 rounded-md hover:bg-teal-100 hover:text-teal-700 transition-colors duration-200">Current Challenges</a>
+                <div>
+                    <a href="#solution-pathways" class="sidebar-link block p-3 rounded-md hover:bg-teal-100 hover:text-teal-700 transition-colors duration-200 font-medium">Solution Pathways</a>
+                    <div class="ml-4 mt-1 space-y-1">
+                        <a href="#solution-regtech" class="sidebar-link block p-2 rounded-md hover:bg-teal-50 hover:text-teal-600 transition-colors duration-200 text-sm">1. RegTech Platforms</a>
+                        <a href="#solution-ai-point" class="sidebar-link block p-2 rounded-md hover:bg-teal-50 hover:text-teal-600 transition-colors duration-200 text-sm">2. AI Point Solutions</a>
+                        <a href="#solution-genai" class="sidebar-link block p-2 rounded-md hover:bg-teal-50 hover:text-teal-600 transition-colors duration-200 text-sm">3. GenAI & LLMs</a>
+                        <a href="#solution-rpa" class="sidebar-link block p-2 rounded-md hover:bg-teal-50 hover:text-teal-600 transition-colors duration-200 text-sm">4. RPA & Workflow Automation</a>
+                        <a href="#solution-custom" class="sidebar-link block p-2 rounded-md hover:bg-teal-50 hover:text-teal-600 transition-colors duration-200 text-sm">5. Custom Solutions</a>
+                    </div>
+                </div>
+                <a href="#important-considerations" class="sidebar-link block p-3 rounded-md hover:bg-teal-100 hover:text-teal-700 transition-colors duration-200">Important Considerations</a>
+                <a href="#phased-approach" class="sidebar-link block p-3 rounded-md hover:bg-teal-100 hover:text-teal-700 transition-colors duration-200">Phased Approach</a>
+                <a href="#conclusion" class="sidebar-link block p-3 rounded-md hover:bg-teal-100 hover:text-teal-700 transition-colors duration-200">Conclusion</a>
+            </aside>
+
+            <main id="main-content" class="flex-1 p-6 md:p-10 bg-white shadow-inner">
+                
+                <section id="introduction" class="content-section space-y-4">
+                    <h2 class="text-3xl font-semibold text-teal-700 border-b-2 border-teal-500 pb-2 mb-6">Introduction: The 10-Day Challenge and the Path to Efficiency</h2>
+                    <p class="text-lg leading-relaxed text-neutral-700">Current Organization has a commendably detailed Entity Due Diligence (EDD) process. This diligence is crucial in today's complex regulatory environment. However, the investment of 10 full-time equivalent (FTE) days per client is a significant operational cost and can impact scalability and responsiveness.</p>
+                    <p class="text-lg leading-relaxed text-neutral-700">The good news is that a wealth of technological solutions exists today that can dramatically streamline this process, reduce manual effort, and empower your analysts to focus on the most critical, judgment-based aspects of EDD. This guide will walk you through various practical and achievable solution pathways. We'll explore how they can help, what they involve, and the pros and cons of each, all explained in a way that's easy to understand.</p>
+                    <div class="mt-6 p-6 border border-neutral-300 rounded-lg shadow-md bg-neutral-50">
+                        <h3 class="text-xl font-semibold text-neutral-700 mb-3 text-center">The EDD Journey: From Challenge to Opportunity</h3>
+                        <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                            <div class="diagram-box w-full sm:w-1/3">Primary EDD Steps</div>
+                            <div class="diagram-arrow hidden sm:flex"></div>
+                            <div class="diagram-box w-full sm:w-1/3 bg-rose-100 border-rose-400">Current State: <br>10 FTE Days / Client</div>
+                            <div class="diagram-arrow hidden sm:flex"></div>
+                             <div class="diagram-box w-auto text-4xl text-teal-600 p-2">?</div>
+                            <div class="diagram-arrow hidden sm:flex"></div>
+                            <div class="diagram-box w-full sm:w-1/3 bg-emerald-100 border-emerald-400">Future State: <br>Reduced Effort + Enhanced Insights</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="current-challenges" class="content-section space-y-4">
+                    <h2 class="text-3xl font-semibold text-teal-700 border-b-2 border-teal-500 pb-2 mb-6">Understanding the Landscape: Where Can We Make the Biggest Difference?</h2>
+                    <p class="text-lg leading-relaxed text-neutral-700">Based on our earlier conversation, the most time-consuming and resource-intensive areas in current EDD process appear to be:</p>
+                    <ul class="list-disc list-inside text-lg leading-relaxed text-neutral-700 space-y-1 pl-4">
+                        <li><strong>Third-party checks:</strong> Accessing and extracting data from WorldCheck and Factiva.</li>
+                        <li><strong>Documentation:</strong> Capturing company profiles, findings from various searches, risk summaries, and completing Risk Management questions.</li>
+                        <li><strong>Adverse Media & Financial Viability Analysis:</strong> Refining searches, reviewing numerous hits, and saving relevant results.</li>
+                        <li><strong>Internal Communication & Coordination:</strong> Managing approvals and conflict checks.</li>
+                    </ul>
+                    <p class="text-lg leading-relaxed text-neutral-700">These are common pain points in EDD, and thankfully, areas where modern technology offers substantial improvements.</p>
+                     <div class="mt-6 p-4 border border-neutral-300 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-neutral-700 mb-3">Current EDD Process (Hover for Pain Points):</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="step-item bg-stone-50">1. ServiceNow Request <span class="tooltip">Pain Point: Manual data entry possible</span></div>
+                            <div class="step-item bg-stone-50">2. EDD Team Approval <span class="tooltip">Pain Point: Potential delays in communication</span></div>
+                            <div class="step-item bg-stone-50">3. Assignment to Person</div>
+                            <div class="step-item bg-stone-50">4. Client Acceptance Framework</div>
+                            <div class="step-item bg-stone-50">5. Document Company Profile <span class="tooltip">Pain Point: Time-consuming documentation</span></div>
+                            <div class="step-item bg-stone-50">6. Check Existing Relations</div>
+                            <div class="step-item bg-stone-50">7. Identify Conflict Check Need <span class="tooltip">Pain Point: Coordination effort</span></div>
+                            <div class="step-item bg-stone-50">8. Submit Conflict Check Request</div>
+                            <div class="step-item bg-red-100 border-red-300">9. PEPs, Sanctions, Corruption Search (WorldCheck) <span class="tooltip">Pain Point: Manual third-party checks, documentation</span></div>
+                            <div class="step-item bg-red-100 border-red-300">10. Adverse Media Search (Factiva, Google) <span class="tooltip">Pain Point: Manual third-party checks, refining searches, documentation</span></div>
+                            <div class="step-item bg-red-100 border-red-300">11. Financial Viability Search (Factiva, Google, Public Records) <span class="tooltip">Pain Point: Manual third-party checks, data extraction, documentation</span></div>
+                            <div class="step-item bg-stone-50">12. Document Risk Summary <span class="tooltip">Pain Point: Time-consuming documentation</span></div>
+                            <div class="step-item bg-stone-50">13. Complete RMS Questions <span class="tooltip">Pain Point: Time-consuming documentation</span></div>
+                            <div class="step-item bg-stone-50">14. Capture Summary in ServiceNow <span class="tooltip">Pain Point: Time-consuming documentation</span></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="solution-pathways" class="content-section space-y-4">
+                    <h2 class="text-3xl font-semibold text-teal-700 border-b-2 border-teal-500 pb-2 mb-6">Solution Pathways: Your Toolkit for Transformation</h2>
+                    <p class="text-lg leading-relaxed text-neutral-700">Let's explore the different types of solutions we could consider. Click on the sub-navigation links to explore each pathway.</p>
+                </section>
+
+                <div id="solution-sections-container">
+                    <section id="solution-regtech" class="content-section space-y-4">
+                        <h3 class="text-2xl font-semibold text-neutral-700">1. All-in-One Super Helpers: Comprehensive RegTech Platforms</h3>
+                        <p class="italic text-neutral-600"><strong>Explained Simply:</strong> Imagine a giant, specialized toolbox built just for tasks like EDD. This toolbox has all the special instruments you need neatly organized in one place, and many of them can do their jobs automatically once you set them up. It helps manage the whole EDD job from start to finish.</p>
+                        
+                        <h4 class="text-xl font-medium text-teal-600 mt-4">How it helps current EDD process:</h4>
+                        <ul class="list-disc list-inside text-neutral-700 space-y-1 pl-4">
+                            <li><strong>Centralized Case Management:</strong> Could manage the entire lifecycle of an EDD request.</li>
+                            <li><strong>Automated Data Ingestion & Screening:</strong> Automatically connect to WorldCheck and Factiva.</li>
+                            <li><strong>Integrated Risk Assessment:</strong> Configurable risk scoring engines.</li>
+                            <li><strong>Workflow Automation:</strong> Automate internal workflows, approvals, conflict checks.</li>
+                            <li><strong>Audit Trails:</strong> Comprehensive, automated audit trails.</li>
+                        </ul>
+
+                        <div class="solution-tabs mt-4" data-solution="regtech">
+                            <div class="flex border-b border-neutral-300">
+                                <button class="tab-button active py-2 px-4 text-neutral-600 hover:text-teal-600 focus:outline-none" data-tab="pros">Pros</button>
+                                <button class="tab-button py-2 px-4 text-neutral-600 hover:text-teal-600 focus:outline-none" data-tab="cons">Cons</button>
+                            </div>
+                            <div class="py-4">
+                                <div class="tab-content active" data-tab="pros">
+                                    <ul class="list-disc list-inside text-neutral-700 space-y-1">
+                                        <li>Offers an end-to-end, integrated solution.</li>
+                                        <li>Potential for significant automation and efficiency gains.</li>
+                                        <li>Standardizes processes and improves consistency.</li>
+                                        <li>Often designed with regulatory requirements in mind.</li>
+                                        <li>Provides a central dashboard for oversight and reporting.</li>
+                                    </ul>
+                                </div>
+                                <div class="tab-content" data-tab="cons">
+                                    <ul class="list-disc list-inside text-neutral-700 space-y-1">
+                                        <li>Can be a significant financial investment.</li>
+                                        <li>Implementation can be complex and time-consuming.</li>
+                                        <li>Customization might be limited.</li>
+                                        <li>Risk of vendor lock-in.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p><strong>Technology Stack (Examples):</strong> Cloud-based SaaS platforms, often with AI/ML components.</p>
+                        <p><strong>Examples of Providers/Concepts:</strong> KYC/AML Platforms, Financial Crime Compliance Suites, EDD Solutions from FinTech/RegTech companies.</p>
+                        
+                        <div class="mt-4 p-4 border border-neutral-300 rounded-lg shadow-sm">
+                            <h4 class="text-lg font-semibold text-neutral-700 mb-2">Difficulty & Timeline:</h4>
+                            <div class="chart-container"><canvas id="regtechChart"></canvas></div>
+                        </div>
+                        
+                        <div class="mt-6 p-4 border border-neutral-300 rounded-lg shadow-md bg-stone-50">
+                            <h4 class="text-lg font-semibold text-neutral-700 mb-3 text-center">Conceptual Diagram: RegTech Platform</h4>
+                            <div class="flex flex-col items-center">
+                                <div class="diagram-box w-1/2 sm:w-1/3 bg-teal-100 border-teal-500">Central RegTech Platform</div>
+                                <div class="flex flex-wrap justify-center items-start mt-2">
+                                    <div class="flex flex-col items-center m-2">
+                                        <div class="diagram-line h-4"></div>
+                                        <div class="diagram-box text-sm">ServiceNow</div>
+                                    </div>
+                                    <div class="flex flex-col items-center m-2">
+                                        <div class="diagram-line h-4"></div>
+                                        <div class="diagram-box text-sm">RiskManagementSystem</div>
+                                    </div>
+                                    <div class="flex flex-col items-center m-2">
+                                        <div class="diagram-line h-4"></div>
+                                        <div class="diagram-box text-sm">Conflict Checker</div>
+                                    </div>
+                                    <div class="flex flex-col items-center m-2">
+                                        <div class="diagram-line h-4"></div>
+                                        <div class="diagram-box text-sm">WorldCheck/Factiva</div>
+                                    </div>
+                                     <div class="flex flex-col items-center m-2">
+                                        <div class="diagram-line h-4"></div>
+                                        <div class="diagram-box text-sm">Analysts/Approvers</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-center mt-2 text-neutral-500">(Lines represent data flow/integration)</p>
+                        </div>
+                    </section>
+
+                    <section id="solution-ai-point" class="content-section space-y-4">
+                        <h3 class="text-2xl font-semibold text-neutral-700">2. Smart Little Helpers: AI-Powered Point Solutions</h3>
+                        <p class="italic text-neutral-600"><strong>Explained Simply:</strong> Instead of one giant toolbox, imagine having a team of small, super-smart robots. Each robot is an expert at one specific, tricky job – like reading thousands of news articles in a flash to find bad news, or instantly checking names against watchlists with amazing accuracy.</p>
+                        
+                        <h4 class="text-xl font-medium text-teal-600 mt-4">How it helps current EDD process:</h4>
+                        <ul class="list-disc list-inside text-neutral-700 space-y-1 pl-4">
+                            <li><strong>Adverse Media Screening :</strong> AI scans news, uses NLP, summarizes findings, reduces false positives.</li>
+                            <li><strong>PEP & Sanctions Screening :</strong> Enhanced accuracy for matching names, reduces false positives.</li>
+                            <li><strong>Document Analysis & Information Extraction :</strong> AI reads documents, extracts key info (ownership, directorships).</li>
+                            <li><strong>Risk Scoring & Anomaly Detection :</strong> ML models assess risk profiles, flag anomalies.</li>
+                        </ul>
+
+                        <div class="solution-tabs mt-4" data-solution="aipoint">
+                             <div class="flex border-b border-neutral-300">
+                                <button class="tab-button active py-2 px-4 text-neutral-600 hover:text-teal-600 focus:outline-none" data-tab="pros">Pros</button>
+                                <button class="tab-button py-2 px-4 text-neutral-600 hover:text-teal-600 focus:outline-none" data-tab="cons">Cons</button>
+                            </div>
+                            <div class="py-4">
+                                <div class="tab-content active" data-tab="pros">
+                                    <ul class="list-disc list-inside text-neutral-700 space-y-1">
+                                        <li>Provides targeted improvements for specific, high-effort tasks.</li>
+                                        <li>Often implemented more quickly and at a lower initial cost.</li>
+                                        <li>Can be integrated with existing systems (RiskManagementSystem, ServiceNow) via APIs.</li>
+                                        <li>Allows picking best-of-breed solutions.</li>
+                                    </ul>
+                                </div>
+                                <div class="tab-content" data-tab="cons">
+                                     <ul class="list-disc list-inside text-neutral-700 space-y-1">
+                                        <li>Need to manage and integrate multiple solutions.</li>
+                                        <li>Ensuring seamless data flow can be challenging.</li>
+                                        <li>Workflow might still have manual hand-offs if not well integrated.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <p><strong>Technology Stack:</strong> Machine Learning (ML), Natural Language Processing (NLP), Optical Character Recognition (OCR), APIs. Often SaaS.</p>
+                        
+                        <div class="mt-4 p-4 border border-neutral-300 rounded-lg shadow-sm">
+                            <h4 class="text-lg font-semibold text-neutral-700 mb-2">Difficulty & Timeline:</h4>
+                            <div class="chart-container"><canvas id="aiPointChart"></canvas></div>
+                        </div>
+
+                        <div class="mt-6 p-4 border border-neutral-300 rounded-lg shadow-md bg-stone-50">
+                            <h4 class="text-lg font-semibold text-neutral-700 mb-3 text-center">Conceptual Diagram: AI Point Solutions in Workflow</h4>
+                            <div class="text-center text-neutral-700">Ajeebo's 14-Step Workflow</div>
+                            <div class="flex justify-around items-center mt-2 flex-wrap">
+                                <div class="diagram-box text-sm m-1">Financial viability concerns <br/>+<br/> <span class="text-teal-600 font-bold">🤖</span> AI Doc Analyzer</div>
+                                <div class="diagram-arrow"></div>
+                                <div class="diagram-box text-sm m-1">Worldcheck <br/>+<br/> <span class="text-teal-600 font-bold">🤖</span> AI List Checker</div>
+                                <div class="diagram-arrow"></div>
+                                <div class="diagram-box text-sm m-1">Adverse media <br/>+<br/> <span class="text-teal-600 font-bold">🤖</span> AI News Reader</div>
+                            </div>
+                            <p class="text-xs text-center mt-2 text-neutral-500">(AI bots <span class="text-teal-600 font-bold">🤖</span> augment specific steps)</p>
+                        </div>
+                    </section>
+
+                    <section id="solution-genai" class="content-section space-y-4">
+                        <h3 class="text-2xl font-semibold text-neutral-700">3. The "Copilot" Approach: Generative AI & LLMs for Enhanced Productivity</h3>
+                         <p class="italic text-neutral-600"><strong>Explained Simply:</strong> Imagine giving your analysts a super-smart assistant (like a "copilot" for their computer work). This assistant can understand plain English questions, read through large amounts of text very quickly, write first drafts of summaries or reports, and help find information. Your analyst is still the pilot, guiding the assistant and checking all its work.</p>
+                        
+                        <h4 class="text-xl font-medium text-teal-600 mt-4">How it helps Ajeebo's process:</h4>
+                        <ul class="list-disc list-inside text-neutral-700 space-y-1 pl-4">
+                            <li><strong>Automated Report & Summary Generation :</strong> Drafts summaries, company profiles, RMS answers.</li>
+                            <li><strong>Information Synthesis & Q&A:</strong> Answers natural language questions about clients.</li>
+                            <li><strong>Drafting Communications:</strong> Assists in drafting standardized emails.</li>
+                            <li><strong>Enhanced Search:</strong> Nuanced search across internal knowledge and EDD data.</li>
+                        </ul>
+
+                         <div class="solution-tabs mt-4" data-solution="genai">
+                             <div class="flex border-b border-neutral-300">
+                                <button class="tab-button active py-2 px-4 text-neutral-600 hover:text-teal-600 focus:outline-none" data-tab="pros">Pros</button>
+                                <button class="tab-button py-2 px-4 text-neutral-600 hover:text-teal-600 focus:outline-none" data-tab="cons">Cons</button>
+                            </div>
+                            <div class="py-4">
+                                <div class="tab-content active" data-tab="pros">
+                                    <ul class="list-disc list-inside text-neutral-700 space-y-1">
+                                        <li>Potential for massive time savings in documentation and report writing.</li>
+                                        <li>Can improve consistency of reports and summaries.</li>
+                                        <li>Empowers analysts by handling tedious writing tasks.</li>
+                                        <li>Can make complex information more accessible.</li>
+                                    </ul>
+                                </div>
+                                <div class="tab-content" data-tab="cons">
+                                    <ul class="list-disc list-inside text-neutral-700 space-y-1">
+                                        <li><strong>Accuracy & "Hallucinations":</strong> Critical need for human oversight and fact-checking.</li>
+                                        <li><strong>Data Privacy & Security:</strong> Concerns with third-party models; private deployments are complex.</li>
+                                        <li><strong>"Grounding" is Essential:</strong> Outputs must be based on factual data from trusted sources.</li>
+                                        <li>Ethical considerations and potential biases.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p><strong>Technology Stack:</strong> Large Language Models (LLMs like GPT, Claude), APIs, Retrieval Augmented Generation (RAG).</p>
+                        
+                        <div class="mt-4 p-4 border border-neutral-300 rounded-lg shadow-sm">
+                            <h4 class="text-lg font-semibold text-neutral-700 mb-2">Difficulty & Timeline:</h4>
+                            <div class="chart-container"><canvas id="genAiChart"></canvas></div>
+                        </div>
+
+                        <div class="mt-6 p-4 border border-neutral-300 rounded-lg shadow-md bg-stone-50">
+                            <h4 class="text-lg font-semibold text-neutral-700 mb-3 text-center">Conceptual Diagram: GenAI Copilot</h4>
+                            <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+                                <div class="flex flex-col items-center">
+                                    <div class="diagram-box text-sm">Data Sources <br/>(WorldCheck, Factiva, RMS, Google)</div>
+                                    <div class="diagram-line h-4 transform rotate-90 md:rotate-0"></div>
+                                    <div class="diagram-arrow hidden md:block transform rotate-90 md:rotate-0 -my-3"></div>
+                                     <div class="diagram-arrow block md:hidden -my-3"></div>
+                                </div>
+                                <div class="diagram-box text-lg bg-teal-100 border-teal-500">🧑‍💻 Analyst + <span class="text-xl">💡</span> GenAI Copilot</div>
+                                <div class="flex flex-col items-center">
+                                     <div class="diagram-arrow hidden md:block transform rotate-90 md:rotate-0 -my-3"></div>
+                                     <div class="diagram-arrow block md:hidden -my-3"></div>
+                                    <div class="diagram-line h-4 transform rotate-90 md:rotate-0"></div>
+                                    <div class="diagram-box text-sm">Drafted Text / Summaries <br/> (For Analyst Review)</div>
+                                </div>
+                            </div>
+                             <p class="text-xs text-center mt-2 text-neutral-500">(Copilot <span class="text-xl">💡</span> accesses data and assists analyst 🧑‍💻)</p>
+                        </div>
+                    </section>
+
+                    <section id="solution-rpa" class="content-section space-y-4">
+                        <h3 class="text-2xl font-semibold text-neutral-700">4. Making Repetitive Tasks Vanish: Workflow Automation & Robotic Process Automation (RPA)</h3>
+                        <p class="italic text-neutral-600"><strong>Explained Simply:</strong> Think of software "robots" that you can teach to do the boring, repetitive, click-by-click tasks that your analysts currently do on their computers. This could be things like copying information from one system and pasting it into another, logging into websites, or filling out standard forms.</p>
+                        
+                        <h4 class="text-xl font-medium text-teal-600 mt-4">How it helps current EDD process:</h4>
+                        <ul class="list-disc list-inside text-neutral-700 space-y-1 pl-4">
+                            <li><strong>Data Entry & Transfer:</strong> Automate ServiceNow to RiskManagementSystem, copy/paste findings.</li>
+                            <li><strong>System Interactions:</strong> Automate logins, searches, report downloads.</li>
+                            <li><strong>Notifications & Basic Workflow:</strong> Automate email notifications for approvals.</li>
+                        </ul>
+
+                        <div class="solution-tabs mt-4" data-solution="rpa">
+                            <div class="flex border-b border-neutral-300">
+                                <button class="tab-button active py-2 px-4 text-neutral-600 hover:text-teal-600 focus:outline-none" data-tab="pros">Pros</button>
+                                <button class="tab-button py-2 px-4 text-neutral-600 hover:text-teal-600 focus:outline-none" data-tab="cons">Cons</button>
+                            </div>
+                            <div class="py-4">
+                                <div class="tab-content active" data-tab="pros">
+                                    <ul class="list-disc list-inside text-neutral-700 space-y-1">
+                                        <li>Excellent for reducing manual effort in repetitive, rule-based tasks.</li>
+                                        <li>Can improve speed and accuracy, reducing human error.</li>
+                                        <li>Relatively quick to implement for simple processes ("quick wins").</li>
+                                        <li>Works with existing systems without needing deep API integrations.</li>
+                                    </ul>
+                                </div>
+                                <div class="tab-content" data-tab="cons">
+                                    <ul class="list-disc list-inside text-neutral-700 space-y-1">
+                                        <li><strong>Brittleness:</strong> Bots can break if application UIs change; requires ongoing maintenance.</li>
+                                        <li><strong>Not "Intelligent":</strong> Doesn't understand data; not for tasks requiring judgment.</li>
+                                        <li>Limited to automating existing processes as-is.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <p><strong>Technology Stack:</strong> RPA platforms (UiPath, Blue Prism, Automation Anywhere, Power Automate).</p>
+                        
+                        <div class="mt-4 p-4 border border-neutral-300 rounded-lg shadow-sm">
+                            <h4 class="text-lg font-semibold text-neutral-700 mb-2">Difficulty & Timeline:</h4>
+                            <div class="chart-container"><canvas id="rpaChart"></canvas></div>
+                        </div>
+
+                        <div class="mt-6 p-4 border border-neutral-300 rounded-lg shadow-md bg-stone-50">
+                            <h4 class="text-lg font-semibold text-neutral-700 mb-3 text-center">Conceptual Diagram: RPA Bot Transferring Data</h4>
+                            <div class="flex flex-col sm:flex-row items-center justify-around space-y-2 sm:space-y-0">
+                                <div class="diagram-box text-sm">ServiceNow</div>
+                                <div class="diagram-arrow"></div>
+                                <div class="diagram-box text-sm">RiskManagementSystem</div>
+                                <div class="mx-4 text-3xl text-teal-600">🦾</div>
+                                <div class="diagram-box text-sm">WorldCheck</div>
+                                <div class="diagram-arrow"></div>
+                                <div class="diagram-box text-sm">Factiva</div>
+                            </div>
+                            <p class="text-xs text-center mt-2 text-neutral-500">(RPA Bot <span class="text-teal-600 text-xl">🦾</span> moves data between systems)</p>
+                        </div>
+                    </section>
+
+                    <section id="solution-custom" class="content-section space-y-4">
+                        <h3 class="text-2xl font-semibold text-neutral-700">5. Building it Your Way: Custom-Developed Integrated Solutions</h3>
+                        <p class="italic text-neutral-600"><strong>Explained Simply:</strong> This is like Company deciding to design and build its very own, perfect EDD workshop from the ground up. Every tool, every workbench, every connection is custom-made to fit Ajeebo's exact needs and preferences.</p>
+                        
+                        <h4 class="text-xl font-medium text-teal-600 mt-4">How it helps current EDD process:</h4>
+                        <ul class="list-disc list-inside text-neutral-700 space-y-1 pl-4">
+                            <li>Bespoke software tailored precisely to current Primary EDD workflow.</li>
+                            <li>Combines elements: case management, custom AI, automated workflows, deep integrations.</li>
+                            <li>Key considerations: scalability, flexibility, real-time processing.</li>
+                        </ul>
+
+                        <div class="solution-tabs mt-4" data-solution="custom">
+                            <div class="flex border-b border-neutral-300">
+                                <button class="tab-button active py-2 px-4 text-neutral-600 hover:text-teal-600 focus:outline-none" data-tab="pros">Pros</button>
+                                <button class="tab-button py-2 px-4 text-neutral-600 hover:text-teal-600 focus:outline-none" data-tab="cons">Cons</button>
+                            </div>
+                            <div class="py-4">
+                                <div class="tab-content active" data-tab="pros">
+                                    <ul class="list-disc list-inside text-neutral-700 space-y-1">
+                                        <li><strong>Perfect Fit:</strong> Designed exactly to EDD specifications.</li>
+                                        <li><strong>Maximum Flexibility & Control:</strong> Company owns and evolves the solution.</li>
+                                        <li><strong>Potential for Competitive Advantage:</strong> Unique, efficient EDD process.</li>
+                                        <li>Seamless integration across the EDD lifecycle.</li>
+                                    </ul>
+                                </div>
+                                <div class="tab-content" data-tab="cons">
+                                    <ul class="list-disc list-inside text-neutral-700 space-y-1">
+                                        <li><strong>Highest Cost:</strong> Most expensive for development and maintenance.</li>
+                                        <li><strong>Longest Implementation Time:</strong> Building from scratch takes time.</li>
+                                        <li><strong>Requires Significant Expertise:</strong> Strong internal team or partners needed.</li>
+                                        <li><strong>Higher Risk:</strong> Complex projects can face delays or fall short.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p><strong>Technology Stack:</strong> Highly varied (Python, Java, Cloud platforms, SQL/NoSQL DBs, AI/ML frameworks, custom APIs).</p>
+                        
+                        <div class="mt-4 p-4 border border-neutral-300 rounded-lg shadow-sm">
+                            <h4 class="text-lg font-semibold text-neutral-700 mb-2">Difficulty & Timeline:</h4>
+                            <div class="chart-container"><canvas id="customChart"></canvas></div>
+                        </div>
+
+                        <div class="mt-6 p-4 border border-neutral-300 rounded-lg shadow-md bg-stone-50">
+                            <h4 class="text-lg font-semibold text-neutral-700 mb-3 text-center">Conceptual Diagram: Custom EDD Platform</h4>
+                            <div class="diagram-box w-3/4 mx-auto bg-teal-100 border-teal-500">
+                                Ajeebo Custom EDD Platform
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                                    <div class="diagram-box text-xs border-teal-300">Step 1 Module</div>
+                                    <div class="diagram-box text-xs border-teal-300">Step 2 Module</div>
+                                    <div class="diagram-box text-xs border-teal-300">...</div>
+                                    <div class="diagram-box text-xs border-teal-300">Step 14 Module</div>
+                                    <div class="diagram-box text-xs border-teal-300">AI Engine</div>
+                                    <div class="diagram-box text-xs border-teal-300">API Integrations</div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-center mt-2 text-neutral-500">(Highly interconnected, purpose-built modules)</p>
+                        </div>
+                    </section>
+                </div>
+
+                <section id="important-considerations" class="content-section space-y-4">
+                    <h2 class="text-3xl font-semibold text-teal-700 border-b-2 border-teal-500 pb-2 mb-6">Important Considerations for Any Solution</h2>
+                    <p class="text-lg leading-relaxed text-neutral-700">No matter which path or combination of paths Ajeebo explores, some universal truths apply. Click on each consideration to expand:</p>
+                    <div id="considerations-list" class="space-y-3 mt-4">
+                        <div class="consideration-item">
+                            <h3 class="consideration-title text-xl font-medium text-neutral-700 hover:text-teal-600 flex justify-between items-center">
+                                Human Oversight is Non-Negotiable <span class="text-teal-500 text-2xl ml-2 transform transition-transform duration-200">+</span>
+                            </h3>
+                            <div class="consideration-content text-neutral-600 mt-1 leading-relaxed">
+                                Skilled human analysts *must* remain in the loop. AI augments human intelligence but final risk decisions require human judgment.
+                            </div>
+                        </div>
+                        <div class="consideration-item">
+                            <h3 class="consideration-title text-xl font-medium text-neutral-700 hover:text-teal-600 flex justify-between items-center">
+                                Data Quality and Governance are Paramount <span class="text-teal-500 text-2xl ml-2 transform transition-transform duration-200">+</span>
+                            </h3>
+                            <div class="consideration-content text-neutral-600 mt-1 leading-relaxed">
+                                Effectiveness hinges on the quality, accuracy, and accessibility of underlying data. "Garbage in, garbage out."
+                            </div>
+                        </div>
+                        <div class="consideration-item">
+                             <h3 class="consideration-title text-xl font-medium text-neutral-700 hover:text-teal-600 flex justify-between items-center">
+                                Integration is Key to Success <span class="text-teal-500 text-2xl ml-2 transform transition-transform duration-200">+</span>
+                            </h3>
+                            <div class="consideration-content text-neutral-600 mt-1 leading-relaxed">
+                                New solutions must effectively communicate with existing systems like ServiceNow and RMS via APIs or proven methods.
+                            </div>
+                        </div>
+                         <div class="consideration-item">
+                             <h3 class="consideration-title text-xl font-medium text-neutral-700 hover:text-teal-600 flex justify-between items-center">
+                                Scalability and Flexibility for the Future <span class="text-teal-500 text-2xl ml-2 transform transition-transform duration-200">+</span>
+                            </h3>
+                            <div class="consideration-content text-neutral-600 mt-1 leading-relaxed">
+                               Solutions should handle growing business needs and adapt to evolving regulations and criminal typologies.
+                            </div>
+                        </div>
+                        <div class="consideration-item">
+                             <h3 class="consideration-title text-xl font-medium text-neutral-700 hover:text-teal-600 flex justify-between items-center">
+                                Don't Underestimate Change Management <span class="text-teal-500 text-2xl ml-2 transform transition-transform duration-200">+</span>
+                            </h3>
+                            <div class="consideration-content text-neutral-600 mt-1 leading-relaxed">
+                               Teams need training, support, and clear communication to embrace and effectively use new tools and processes.
+                            </div>
+                        </div>
+                         <div class="consideration-item">
+                             <h3 class="consideration-title text-xl font-medium text-neutral-700 hover:text-teal-600 flex justify-between items-center">
+                                Maintain Regulatory Compliance <span class="text-teal-500 text-2xl ml-2 transform transition-transform duration-200">+</span>
+                            </h3>
+                            <div class="consideration-content text-neutral-600 mt-1 leading-relaxed">
+                               Any new tool or process must ensure Ajeebo meets all obligations (AUSTRAC rules, etc.). Technology should enhance compliance.
+                            </div>
+                        </div>
+                         <div class="consideration-item">
+                             <h3 class="consideration-title text-xl font-medium text-neutral-700 hover:text-teal-600 flex justify-between items-center">
+                                Start with a Clear Problem Definition <span class="text-teal-500 text-2xl ml-2 transform transition-transform duration-200">+</span>
+                            </h3>
+                            <div class="consideration-content text-neutral-600 mt-1 leading-relaxed">
+                               Clearly define which parts of the 10-day process cause the most pain and offer the biggest improvement opportunity before choosing solutions.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="phased-approach" class="content-section space-y-4">
+                    <h2 class="text-3xl font-semibold text-teal-700 border-b-2 border-teal-500 pb-2 mb-6">Choosing Your Path: A Phased Approach is Often Best</h2>
+                    <p class="text-lg leading-relaxed text-neutral-700">It's rarely an "either/or" choice. The most effective strategy for Company will likely involve a <strong>hybrid approach</strong>, combining elements from different solution pathways in a phased manner:</p>
+                    
+                    <div class="mt-6 space-y-8">
+                        <div class="p-6 border border-teal-500 rounded-lg shadow-lg bg-teal-50">
+                            <h3 class="text-2xl font-semibold text-teal-700 mb-3">Phase 1: Quick Wins & Targeted Relief <span class="text-base font-normal text-neutral-600">(e.g., 3-9 months)</span></h3>
+                            <div class="flex items-center space-x-4 mb-2">
+                                <span class="text-3xl text-teal-600">🦾</span>
+                                <p class="text-neutral-700">Implement <strong>RPA</strong> for straightforward, high-volume data entry or system interaction tasks.</p>
+                            </div>
+                             <div class="flex items-center space-x-4">
+                                <span class="text-3xl text-teal-600">📰</span>
+                                <p class="text-neutral-700">Pilot an <strong>AI-Powered Point Solution</strong> for Adverse Media Screening.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center text-3xl text-neutral-400 my-2">▼</div>
+
+                        <div class="p-6 border border-sky-500 rounded-lg shadow-lg bg-sky-50">
+                            <h3 class="text-2xl font-semibold text-sky-700 mb-3">Phase 2: Enhancing Analyst Productivity & Deeper Insights <span class="text-base font-normal text-neutral-600">(e.g., 6-15 months)</span></h3>
+                             <div class="flex items-center space-x-4 mb-2">
+                                <span class="text-3xl text-sky-600">💡</span>
+                                <p class="text-neutral-700">Explore a <strong>Generative AI "Copilot"</strong> solution (firewalled, grounded) for drafting summaries and reports.</p>
+                            </div>
+                             <div class="flex items-center space-x-4 mb-2">
+                                <span class="text-3xl text-sky-600">🧩</span>
+                                <p class="text-neutral-700">Implement additional <strong>AI Point Solutions</strong> (document analysis, enhanced screening).</p>
+                            </div>
+                             <div class="flex items-center space-x-4">
+                                <span class="text-3xl text-sky-600">⚙️</span>
+                                <p class="text-neutral-700">Improve <strong>workflow automation</strong> (Power Platform, dedicated tools).</p>
+                            </div>
+                        </div>
+
+                        <div class="text-center text-3xl text-neutral-400 my-2">▼</div>
+                        
+                        <div class="p-6 border border-indigo-500 rounded-lg shadow-lg bg-indigo-50">
+                            <h3 class="text-2xl font-semibold text-indigo-700 mb-3">Phase 3: Strategic Platforming <span class="text-base font-normal text-neutral-600">(e.g., 12-24+ months)</span></h3>
+                            <div class="flex items-center space-x-4">
+                                 <span class="text-3xl text-indigo-600">🏛️</span>
+                                <p class="text-neutral-700">Based on learnings, decide on investing in a <strong>Comprehensive RegTech Platform</strong> or developing a more <strong>Custom-Integrated Solution</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="conclusion" class="content-section space-y-4">
+                    <h2 class="text-3xl font-semibold text-teal-700 border-b-2 border-teal-500 pb-2 mb-6">Conclusion: The Future of EDD at Company is Bright</h2>
+                    <p class="text-lg leading-relaxed text-neutral-700">The journey to reduce a 10-day EDD process is significant, but entirely achievable with today's technology. By strategically adopting a blend of automation, AI-driven insights, and potentially more comprehensive platforms, Company can:</p>
+                    <ul class="list-disc list-inside text-lg leading-relaxed text-neutral-700 space-y-1 pl-4">
+                        <li>Dramatically reduce manual effort and processing times.</li>
+                        <li>Enhance the quality and consistency of due diligence.</li>
+                        <li>Empower analysts to focus on critical thinking and complex risk assessment.</li>
+                        <li>Improve scalability to support business growth.</li>
+                        <li>Strengthen overall regulatory compliance and risk management.</li>
+                    </ul>
+                    <p class="text-lg leading-relaxed text-neutral-700 mt-4">The key is to approach this transformation thoughtfully, starting with clear objectives, understanding the options, and implementing solutions in a way that brings tangible value to your analysts and to Company as a whole. This is not just about cutting costs; it's about building a more intelligent, agile, and resilient EDD capability for the future.</p>
+                </section>
+            </main>
+        </div>
+
+        <footer class="bg-neutral-800 text-white text-center p-4 mt-auto">
+            <p class="text-sm">&copy; 2025 Company EDD Solutions Interactive Guide. For illustrative purposes.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const appContainer = document.getElementById('app-container');
+            const passwordPromptContainer = document.getElementById('password-prompt-container');
+            const passwordInput = document.getElementById('password-input');
+            const passwordSubmit = document.getElementById('password-submit');
+            const errorMessage = document.getElementById('error-message');
+            const correctPassword = "VeloxAI"; // Define the correct password
+
+            function initializeApp() {
+                // All the original DOMContentLoaded logic goes here
+                const sidebarLinks = document.querySelectorAll('.sidebar-link');
+                const contentSections = document.querySelectorAll('.content-section');
+                const solutionSectionsContainer = document.getElementById('solution-sections-container');
+                
+                const solutionData = {
+                    regtech: { difficulty: 3, timeline: 12, label: 'RegTech Platform' },
+                    aipoint: { difficulty: 2, timeline: 7.5, label: 'AI Point Solution' },
+                    genai: { difficulty: 3, timeline: 9, label: 'GenAI & LLMs' },
+                    rpa: { difficulty: 1, timeline: 2, label: 'RPA & Workflow Automation' },
+                    custom: { difficulty: 4, timeline: 18, label: 'Custom Solution' }
+                };
+
+                function createChart(canvasId, data) {
+                    const ctx = document.getElementById(canvasId).getContext('2d');
+                    if (window.charts && window.charts[canvasId]) {
+                        window.charts[canvasId].destroy();
+                    }
+                    if (!window.charts) window.charts = {};
+
+                    window.charts[canvasId] = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Difficulty (1-4)', 'Timeline (Months)'],
+                            datasets: [{
+                                label: data.label,
+                                data: [data.difficulty, data.timeline],
+                                backgroundColor: [
+                                    'rgba(20, 184, 166, 0.6)', 
+                                    'rgba(13, 148, 136, 0.6)'  
+                                ],
+                                borderColor: [
+                                    'rgba(20, 184, 166, 1)',
+                                    'rgba(13, 148, 136, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    suggestedMax: data.timeline > 15 ? Math.ceil(data.timeline / 5) * 5 + 5 : (data.timeline > 10 ? 15:10)
+                                }
+                            },
+                            plugins: {
+                                legend: { display: true },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.dataset.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            if (context.parsed.y !== null) {
+                                                label += context.parsed.y;
+                                                if(context.label === 'Difficulty (1-4)') label += ' (1=Low, 4=V.High)';
+                                                else label += ' months';
+                                            }
+                                            return label;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                function activateSection(hash) {
+                    contentSections.forEach(section => section.classList.remove('active'));
+                    sidebarLinks.forEach(link => link.classList.remove('active'));
+
+                    let targetSectionId = hash.substring(1);
+                    let targetSection = document.getElementById(targetSectionId);
+                    
+                    if (!targetSection && targetSectionId.startsWith('solution-')) {
+                        document.getElementById('solution-pathways').classList.add('active');
+                        targetSection = document.getElementById(targetSectionId); 
+                    } else if (!targetSection) {
+                        targetSectionId = 'introduction'; 
+                        targetSection = document.getElementById(targetSectionId);
+                    }
+                    
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                        if (targetSection.parentElement === solutionSectionsContainer) {
+                            document.getElementById('solution-pathways').classList.add('active');
+                        }
+
+                        const activeLink = document.querySelector(`.sidebar-link[href="#${targetSectionId}"]`);
+                        if (activeLink) {
+                            activeLink.classList.add('active');
+                            if (activeLink.parentElement.parentElement.querySelector('a[href="#solution-pathways"]')) {
+                                 activeLink.parentElement.parentElement.querySelector('a[href="#solution-pathways"]').classList.add('active');
+                            }
+                        }
+                    }
+
+                    if (targetSectionId.startsWith('solution-') && solutionData[targetSectionId.substring(9)]) {
+                        const solutionKey = targetSectionId.substring(9);
+                        createChart(`${solutionKey}Chart`, solutionData[solutionKey]);
+                    }
+                    window.scrollTo(0,0); 
+                }
+                
+                sidebarLinks.forEach(link => {
+                    link.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const newHash = this.getAttribute('href');
+                        if(window.location.hash !== newHash) {
+                            window.location.hash = newHash;
+                        } else {
+                            activateSection(newHash);
+                        }
+                    });
+                });
+
+                window.addEventListener('hashchange', () => activateSection(window.location.hash));
+
+                if (window.location.hash) {
+                    activateSection(window.location.hash);
+                } else {
+                    activateSection('#introduction');
+                }
+
+                const solutionTabContainers = document.querySelectorAll('.solution-tabs');
+                solutionTabContainers.forEach(container => {
+                    const tabButtons = container.querySelectorAll('.tab-button');
+                    const tabContents = container.querySelectorAll('.tab-content');
+
+                    tabButtons.forEach(button => {
+                        button.addEventListener('click', function() {
+                            tabButtons.forEach(btn => btn.classList.remove('active'));
+                            this.classList.add('active');
+
+                            const targetTab = this.getAttribute('data-tab');
+                            tabContents.forEach(content => {
+                                if (content.getAttribute('data-tab') === targetTab) {
+                                    content.classList.add('active');
+                                } else {
+                                    content.classList.remove('active');
+                                }
+                            });
+                        });
+                    });
+                });
+
+                const considerationItems = document.querySelectorAll('.consideration-item');
+                considerationItems.forEach(item => {
+                    const title = item.querySelector('.consideration-title');
+                    const content = item.querySelector('.consideration-content');
+                    const icon = title.querySelector('span');
+
+                    title.addEventListener('click', () => {
+                        const isVisible = content.style.display === 'block';
+                        content.style.display = isVisible ? 'none' : 'block';
+                        icon.textContent = isVisible ? '+' : '-';
+                        icon.classList.toggle('rotate-45', !isVisible); 
+                    });
+                });
+            }
+
+            // Password check logic
+            function checkPassword() {
+                if (passwordInput.value === correctPassword) {
+                    passwordPromptContainer.style.display = 'none';
+                    appContainer.style.display = 'block';
+                    initializeApp(); // Initialize the app's main functionalities
+                } else {
+                    errorMessage.classList.remove('hidden');
+                    passwordInput.value = ''; // Clear the input
+                    passwordInput.focus();
+                }
+            }
+
+            passwordSubmit.addEventListener('click', checkPassword);
+            passwordInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    checkPassword();
+                }
+            });
+            
+            // Focus on password input on load
+            passwordInput.focus();
+
+        });
+    </script>
+</body>
+</html>
